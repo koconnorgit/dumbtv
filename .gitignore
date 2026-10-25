@@ -8,3 +8,5 @@ launcher/*.keystore
 video/
 __pycache__/
 *.pyc
+panel/build/
+ha_token.txt

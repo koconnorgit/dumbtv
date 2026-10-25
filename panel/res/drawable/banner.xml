@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="180dp"
+    android:viewportWidth="320"
+    android:viewportHeight="180">
+    <path
+        android:fillColor="#FF18BCF2"
+        android:pathData="M0,0h320v180h-320z" />
+    <!-- a house outline, the Home Assistant mark's shape -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M160,38 L96,100 h18 v46 h92 v-46 h18 Z M160,58 l40,39 v37 h-80 v-37 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M156,88h8v46h-8z M138,106h8v28h-8z M174,106h8v28h-8z" />
+</vector>
