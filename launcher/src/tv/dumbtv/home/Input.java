@@ -17,6 +17,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -50,16 +51,19 @@ public final class Input extends Activity {
         @Override
         public void onConnectionFailed(String inputId) {
             status(FAILED);
+            keepAwake(false);
         }
 
         @Override
         public void onDisconnected(String inputId) {
             status(FAILED);
+            keepAwake(false);
         }
 
         @Override
         public void onVideoAvailable(String inputId) {
             status(null);
+            keepAwake(true);
         }
 
         @Override
@@ -67,9 +71,22 @@ public final class Input extends Activity {
             // Tuning and buffering are on the way to a picture; everything else means none is coming.
             boolean pending = reason == TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING
                     || reason == TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING;
-            if (!pending) status(NO_SIGNAL);
+            if (!pending) {
+                status(NO_SIGNAL);
+                keepAwake(false);
+            }
         }
     };
+
+    /**
+     * A picture on the input counts as activity, like a playing app: the inactivity timer must not
+     * put the TV to sleep in the middle of a film. With no signal the timer runs as usual.
+     */
+    private void keepAwake(boolean on) {
+        int flag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+        if (on) getWindow().addFlags(flag);
+        else getWindow().clearFlags(flag);
+    }
 
     /**
      * The intent that opens {@code it} on this screen, or null when the user picked the TV's own
