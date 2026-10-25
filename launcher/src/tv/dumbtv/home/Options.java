@@ -112,8 +112,8 @@ public final class Options extends Activity {
                 value.setText(focused ? "‹  " + text + "  ›" : text);
             }
             value.setTextColor(focused ? Ui.TEXT : Ui.MUTED);
-            boolean off = (c == Config.DIM || c == Config.ROTATE)
-                    && !"image".equals(cfg.get(Config.BACKGROUND))
+            boolean off = c == Config.DIM && !cfg.pictured()
+                    || c == Config.ROTATE && !"image".equals(cfg.get(Config.BACKGROUND))
                     || c == Config.SWITCH && "off".equals(cfg.get(Config.INPUTS));
             row.setAlpha(off ? 0.4f : 1f);
         };

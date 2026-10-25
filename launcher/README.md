@@ -82,11 +82,21 @@ update one with the other: `install.sh` says so and tells you to
 
 **Options** cycles each setting with ◀ ▶ or OK: accent color, tile size, app names
 (on focus / always / never), clock format, inputs row, what opens inputs (see below),
-background (black, graphite, midnight, or an image), image dim and wallpaper rotation,
+background (dusk, black, graphite, midnight, or an image), image dim and wallpaper rotation,
 and **Next wallpaper**
 steps to the next image. It also lists which apps and inputs appear on
 the home screen. Apps without a TV banner, like the Appstore or Downloads, start
 hidden; tick them there to add them.
+
+## The look
+
+The clock sits top-left and the rows sit in the lower third, the way a TV home screen puts
+its picture first. **Dusk**, the default background, is a sky drawn from gradients inside the
+app (no image file, no bytes in the APK); a scrim darkens the top band and the bottom so the
+clock and the rows stay readable, and **Image dim** scales it. Pick **Image file** to put
+your own photo behind the same scrim. App tiles carry a shadow and a white ring on focus;
+inputs are pills, with a green dot when something is plugged in. The text is Amazon Ember,
+the TV's own face, with Roboto on boxes that do not ship it.
 
 ## HDMI inputs
 

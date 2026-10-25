@@ -70,9 +70,9 @@ final class Config {
     static final Choice SWITCH = new Choice("switch", "Open inputs with", "tv",
             new String[] {"tv", "home"},
             new String[] {"The TV's app", "dumbtv home"});
-    static final Choice BACKGROUND = new Choice("background", "Background", "black",
-            new String[] {"black", "graphite", "midnight", "image"},
-            new String[] {"Black", "Graphite", "Midnight", "Image file"});
+    static final Choice BACKGROUND = new Choice("background", "Background", "dusk",
+            new String[] {"dusk", "black", "graphite", "midnight", "image"},
+            new String[] {"Dusk", "Black", "Graphite", "Midnight", "Image file"});
     static final Choice DIM = new Choice("dim", "Image dim", "40",
             new String[] {"0", "20", "40", "60", "80"},
             new String[] {"0%", "20%", "40%", "60%", "80%"});
@@ -90,7 +90,7 @@ final class Config {
     private static final int[] ACCENTS = {
         0xFFFFFFFF, 0xFF3D8BFF, 0xFF2BC4E8, 0xFF34C759, 0xFFFFB340, 0xFFFF5147, 0xFFFF5C9D, 0xFFA07CFF,
     };
-    private static final int[] BACKGROUNDS = {0xFF000000, 0xFF141518, 0xFF0B1220, 0xFF000000};
+    private static final int[] BACKGROUNDS = {0xFF17213D, 0xFF000000, 0xFF141518, 0xFF0B1220, 0xFF000000};
 
     private static Config instance;
 
@@ -214,6 +214,12 @@ final class Config {
 
     int background() {
         return BACKGROUNDS[Arrays.asList(BACKGROUND.values).indexOf(get(BACKGROUND))];
+    }
+
+    /** True when a picture (the built-in dusk or an image file) shows behind the rows. */
+    boolean pictured() {
+        String bg = get(BACKGROUND);
+        return "dusk".equals(bg) || "image".equals(bg);
     }
 
     /** Counts returns to the home screen, for the "visit" rotation. */

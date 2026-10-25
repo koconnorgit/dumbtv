@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.media.tv.TvInputManager;
 import android.net.Uri;
@@ -63,6 +62,7 @@ public final class Home extends Activity {
     private Row apps, inputs;
     private Tile moving;
     private String wallKey;
+    private int shadeDim = -1;
 
     private final BroadcastReceiver packages = new BroadcastReceiver() {
         @Override
@@ -111,9 +111,10 @@ public final class Home extends Activity {
         Row(String kind, String name, LinearLayout parent) {
             this.kind = kind;
             int edge = dp(56), bleed = dp(14);
-            title = Ui.text(Home.this, 12, Ui.FAINT, Ui.MEDIUM);
+            title = Ui.text(Home.this, 11, 0x8CFFFFFF, Ui.MEDIUM);
             title.setText(name.toUpperCase(Locale.ROOT));
-            title.setLetterSpacing(0.14f);
+            title.setLetterSpacing(0.2f);
+            Ui.shadow(title);
             title.setPadding(edge, dp(20), edge, dp(2));
             strip = new LinearLayout(Home.this);
             strip.setClipChildren(false);
@@ -184,7 +185,7 @@ public final class Home extends Activity {
             loadApps(null);
             return;
         }
-        int fit = getResources().getDisplayMetrics().widthPixels / (cardSize()[0] + dp(18)) + 1;
+        int fit = getResources().getDisplayMetrics().widthPixels / (cardSize()[0] + dp(17)) + 1;
         for (Item it : Catalog.visible(cfg, Catalog.APPS, apps.all)) {
             if (fit-- <= 0) break;
             Catalog.art(getPackageManager(), it);
@@ -423,15 +424,20 @@ public final class Home extends Activity {
         head.setPadding(dp(56), 0, dp(56), dp(12));
         LinearLayout when = new LinearLayout(this);
         when.setOrientation(LinearLayout.VERTICAL);
-        clock = Ui.text(this, 52, Ui.TEXT, Ui.LIGHT);
-        date = Ui.text(this, 15, Ui.MUTED, Ui.MEDIUM);
+        clock = Ui.text(this, 50, Ui.TEXT, Ui.DISPLAY);
+        Ui.shadow(clock);
+        date = Ui.text(this, 14, 0xC7FFFFFF, Ui.MEDIUM);
         date.setPadding(dp(2), dp(8), 0, 0);
+        Ui.shadow(date);
         when.addView(clock);
         when.addView(date);
         head.addView(when, new LinearLayout.LayoutParams(0, WRAP, 1f));
         head.addView(chip("Options", v -> startActivity(new Intent(this, Options.class))));
         head.addView(chip("Settings", v -> openSettings()));
         column.addView(head, new LinearLayout.LayoutParams(MATCH, WRAP));
+        // Takes whatever height the rows leave, so they sit in the lower third of the screen
+        // and only scroll when there is more than fits.
+        column.addView(new View(this), new LinearLayout.LayoutParams(MATCH, 0, 1f));
 
         apps = new Row(Catalog.APPS, "Apps", column);
         inputs = new Row(Catalog.INPUTS, "Inputs", column);
@@ -460,6 +466,7 @@ public final class Home extends Activity {
     private TextView chip(String label, View.OnClickListener click) {
         TextView v = Ui.text(this, 14, Ui.TEXT, Ui.MEDIUM);
         v.setText(label);
+        Ui.shadow(v);
         v.setGravity(Gravity.CENTER);
         v.setPadding(dp(18), dp(9), dp(18), dp(9));
         v.setFocusable(true);
@@ -478,7 +485,7 @@ public final class Home extends Activity {
     private void apply() {
         applied = cfg.version();
         int accent = cfg.accent();
-        for (TextView c : chips) Ui.focusStyle(c, accent, 0x14FFFFFF, dp(18));
+        for (TextView c : chips) Ui.focusStyle(c, accent, 0x00000000, dp(18));
         render(apps);
         render(inputs);
         background();
@@ -534,7 +541,7 @@ public final class Home extends Activity {
                 return true;
             });
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(WRAP, WRAP);
-            lp.rightMargin = dp(18);
+            lp.rightMargin = dp(Catalog.APPS.equals(row.kind) ? 17 : 9);
             row.strip.addView(t, lp);
             if (it.id.equals(keep)) restore = index;
             index++;
@@ -563,11 +570,11 @@ public final class Home extends Activity {
     private int[] cardSize() {
         switch (cfg.get(Config.TILES)) {
             case "small":
-                return new int[] {dp(144), dp(81)};
+                return new int[] {dp(160), dp(90)};
             case "large":
-                return new int[] {dp(224), dp(126)};
+                return new int[] {dp(240), dp(135)};
             default:
-                return new int[] {dp(180), dp(101)};
+                return new int[] {dp(200), dp(113)};
         }
     }
 
@@ -600,16 +607,20 @@ public final class Home extends Activity {
     }
 
     private void background() {
-        boolean image = "image".equals(cfg.get(Config.BACKGROUND));
-        File file = image ? cfg.wallpaper() : null;
+        String bg = cfg.get(Config.BACKGROUND);
+        boolean dusk = "dusk".equals(bg);
+        File file = "image".equals(bg) ? cfg.wallpaper() : null;
         root.setBackgroundColor(cfg.background());
-        int dim = Integer.parseInt(cfg.get(Config.DIM));
-        shade.setBackgroundColor(file == null ? Color.TRANSPARENT : Color.argb(dim * 255 / 100, 0, 0, 0));
-        String key = file == null ? null : file.getPath() + ":" + file.lastModified();
+        int dim = (file != null || dusk) ? Integer.parseInt(cfg.get(Config.DIM)) : 0;
+        if (dim != shadeDim) {
+            shadeDim = dim;
+            shade.setBackground(dim == 0 ? null : new Scrim(dim / 40f));
+        }
+        String key = file != null ? file.getPath() + ":" + file.lastModified() : dusk ? "dusk" : null;
         if (key == null ? wallKey == null : key.equals(wallKey)) return;
         wallKey = key;
         if (file == null) {
-            wall.setImageDrawable(null);
+            wall.setImageDrawable(dusk ? new Dusk() : null);
             return;
         }
         io.execute(() -> {
