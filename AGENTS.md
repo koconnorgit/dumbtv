@@ -168,6 +168,7 @@ Read the recovery table instead of disabling more packages.
 | Nothing blocked but `tun0` exists | the filter app was `force-stop`ped | reboot the TV — never `am force-stop dnsfilter.android` |
 | "Unable to Detect Your Remote" over everything | `com.amazon.vizzini` was disabled | `adb shell pm enable --user 0 com.amazon.vizzini`, reboot |
 | A streaming app stops working | a host it needs is blocked | unblock that exact host in `data/blocklists/extra-hosts.txt`, re-run `dnsfilter.sh` |
+| TV sleeps about 5 minutes after the last key press | `com.amazon.ftv.screensaver` is disabled, so when the screen-saver timer fires the TV sleeps instead | `adb shell settings put system screen_off_timeout 1200000` (20 min; the value is milliseconds) |
 | Start over | — | `./scripts/restore.sh -y` |
 
 `restore.sh` re-enables packages, clears app-ops and network rules and restores
